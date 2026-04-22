@@ -1,0 +1,802 @@
+[
+  {
+    "id": "001",
+    "category": "Port Drift",
+    "doc_snippet": "For the frontend application to communicate with the backend API, ensure the node server is listening on port 8080.",
+    "ground_truth_intent": {"required_ports": ["8080"]},
+    "simulated_live_state": {"active_ports": ["9090"]},
+    "expected_reconciliation": "Drift detected. Intent requires port 8080, but system is listening on 9090."
+  },
+  {
+    "id": "002",
+    "category": "Package Drift",
+    "doc_snippet": "The proxy server relies on Nginx for load balancing. Please ensure nginx is installed and updated before running the startup script.",
+    "ground_truth_intent": {"required_packages": ["nginx"]},
+    "simulated_live_state": {"installed_packages": ["apache2"]},
+    "expected_reconciliation": "Drift detected. Intent requires 'nginx', but package is not found on the system."
+  },
+  {
+    "id": "003",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Session caching is handled by Redis. Make sure the redis-server container is running in the background.",
+    "ground_truth_intent": {"required_services": ["redis-server"]},
+    "simulated_live_state": {"running_services": ["postgresql", "nginx"]},
+    "expected_reconciliation": "Drift detected. Redis container is required but is not currently running."
+  },
+  {
+    "id": "004",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "The production database credentials must be injected at runtime. Verify that the DB_HOST and DB_PASSWORD environment variables are set.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "DB_HOST", "value": "*"}, {"name": "DB_PASSWORD", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "DB_HOST", "value": "localhost"}]},
+    "expected_reconciliation": "Drift detected. Critical environment variable 'DB_PASSWORD' is missing from the system state."
+  },
+  {
+    "id": "005",
+    "category": "Port Drift",
+    "doc_snippet": "Secure communication is strictly enforced. The API gateway must listen on the standard HTTPS port to accept incoming traffic.",
+    "ground_truth_intent": {"required_ports": ["443"]},
+    "simulated_live_state": {"active_ports": ["8443"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation implies port 443 (standard HTTPS), but the system is listening on 8443."
+  },
+  {
+    "id": "006",
+    "category": "Port Drift",
+    "doc_snippet": "The PostgreSQL primary database is configured to accept connections from the internal subnet on port 5432.",
+    "ground_truth_intent": {"required_ports": ["5432"]},
+    "simulated_live_state": {"active_ports": ["5433"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation specifies port 5432 for PostgreSQL, but ss output shows port 5433."
+  },
+  {
+    "id": "007",
+    "category": "Port Drift",
+    "doc_snippet": "Message brokering is handled by RabbitMQ. Ensure the AMQP port 5672 is open for worker nodes to pull tasks.",
+    "ground_truth_intent": {"required_ports": ["5672"]},
+    "simulated_live_state": {"active_ports": ["25672"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT or SYSTEM_FAULT). Intent requires 5672, but system exposes 25672 (RabbitMQ clustering port instead of AMQP)."
+  },
+  {
+    "id": "008",
+    "category": "Package Drift",
+    "doc_snippet": "To run the daily backup cron jobs, you must have both curl and wget installed on the target machine.",
+    "ground_truth_intent": {"required_packages": ["curl", "wget"]},
+    "simulated_live_state": {"installed_packages": ["curl"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires 'wget' and 'curl', but dpkg output shows 'wget' is missing."
+  },
+  {
+    "id": "009",
+    "category": "Package Drift",
+    "doc_snippet": "The machine learning pipeline requires python3.10 to utilize the new pattern matching features. Older versions will fail to compile.",
+    "ground_truth_intent": {"required_packages": ["python3.10"]},
+    "simulated_live_state": {"installed_packages": ["python3.8"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). System has python3.8 installed, but documentation explicitly mandates python3.10."
+  },
+  {
+    "id": "010",
+    "category": "Package Drift",
+    "doc_snippet": "For parsing the AWS logs in the terminal, the jq JSON processor package is a mandatory dependency.",
+    "ground_truth_intent": {"required_packages": ["jq"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'jq' package is required by the runbook but is entirely absent from the system."
+  },
+  {
+    "id": "011",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Log aggregation is managed by Elastic. Verify that the elasticsearch docker container is active and running.",
+    "ground_truth_intent": {"required_services": ["elasticsearch"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation mandates an active 'elasticsearch' container, but docker ps shows it is not running."
+  },
+  {
+    "id": "012",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "System maintenance scripts rely on the standard scheduler. The cron service must be enabled and running at all times.",
+    "ground_truth_intent": {"required_services": ["cron"]},
+    "simulated_live_state": {"running_services": ["systemd-journald"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Systemctl status indicates the 'cron' service is stopped or disabled, violating the runbook."
+  },
+  {
+    "id": "013",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "To reduce database load, the application tier requires the memcached systemd service to be running locally.",
+    "ground_truth_intent": {"required_services": ["memcached"]},
+    "simulated_live_state": {"running_services": ["redis-server"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). Documentation requires memcached, but the system is running redis-server. This may indicate a legacy document that missed a caching migration."
+  },
+  {
+    "id": "014",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Before starting the server, you must set the FLASK_APP environment variable to 'wsgi.py' to define the application entry point.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "FLASK_APP", "value": "wsgi.py"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Critical environment variable 'FLASK_APP' is not set in the active environment."
+  },
+  {
+    "id": "015",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "In production environments, the LOG_LEVEL environment variable should be strictly set to INFO to prevent disk saturation.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "LOG_LEVEL", "value": "INFO"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "LOG_LEVEL", "value": "DEBUG"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Intent requires LOG_LEVEL=INFO, but printenv shows LOG_LEVEL=DEBUG, violating production rules."
+  },
+  {
+    "id": "016",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Authentication tokens are signed using a symmetric key. Ensure JWT_SECRET is populated in the environment.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "JWT_SECRET", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "DB_PASSWORD", "value": "supersecret"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required 'JWT_SECRET' variable is missing from the system environment."
+  },
+  {
+    "id": "017",
+    "category": "Port Drift",
+    "doc_snippet": "To prevent unauthorized brute-force attempts, the default SSH port has been remapped. You must connect via port 2222.",
+    "ground_truth_intent": {"required_ports": ["2222"]},
+    "simulated_live_state": {"active_ports": ["22"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires SSH on custom port 2222, but the system is still listening on the default port 22."
+  },
+  {
+    "id": "018",
+    "category": "Port Drift",
+    "doc_snippet": "The Prometheus Node Exporter scrapes hardware metrics continuously. Make sure it is bound to port 9100 on all worker nodes.",
+    "ground_truth_intent": {"required_ports": ["9100"]},
+    "simulated_live_state": {"active_ports": ["9090"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Expected Node Exporter port 9100 is not active; port 9090 is found instead."
+  },
+  {
+    "id": "019",
+    "category": "Port Drift",
+    "doc_snippet": "Our legacy billing app communicates directly with the MySQL database instance over the default port 3306.",
+    "ground_truth_intent": {"required_ports": ["3306"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required MySQL port 3306 is not open, indicating the database is down or misconfigured."
+  },
+  {
+    "id": "020",
+    "category": "Port Drift",
+    "doc_snippet": "Gunicorn is configured to serve the Django backend internally. Ensure the upstream server targets port 8000.",
+    "ground_truth_intent": {"required_ports": ["8000"]},
+    "simulated_live_state": {"active_ports": ["8001"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). System is listening on 8001. The documentation may be outdated following a recent port rotation."
+  },
+  {
+    "id": "021",
+    "category": "Port Drift",
+    "doc_snippet": "Internal DNS resolution is handled by a local Bind9 server. Port 53 (UDP/TCP) must be available for DNS queries.",
+    "ground_truth_intent": {"required_ports": ["53"]},
+    "simulated_live_state": {"active_ports": ["5353"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required DNS port 53 is missing. The system appears to be running mDNS on 5353 instead."
+  },
+  {
+    "id": "022",
+    "category": "Package Drift",
+    "doc_snippet": "System administrators must have htop installed on all instances to perform interactive process monitoring during incidents.",
+    "ground_truth_intent": {"required_packages": ["htop"]},
+    "simulated_live_state": {"installed_packages": ["top"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). 'htop' is mandated by the runbook but is missing from the system."
+  },
+  {
+    "id": "023",
+    "category": "Package Drift",
+    "doc_snippet": "The deployment script compiles C extensions locally. You will need gcc and make installed to build the binaries.",
+    "ground_truth_intent": {"required_packages": ["gcc", "make"]},
+    "simulated_live_state": {"installed_packages": ["make"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'make' package is present, but 'gcc' is missing, which will cause compile failures."
+  },
+  {
+    "id": "024",
+    "category": "Package Drift",
+    "doc_snippet": "To run the nightly database dumps, the postgresql-client utility package must be present on the bastion host.",
+    "ground_truth_intent": {"required_packages": ["postgresql-client"]},
+    "simulated_live_state": {"installed_packages": ["mysql-client"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires 'postgresql-client', but dpkg shows only 'mysql-client' installed."
+  },
+  {
+    "id": "025",
+    "category": "Package Drift",
+    "doc_snippet": "Static assets are synced to the backup server every hour. Ensure rsync is installed to handle the file transfers.",
+    "ground_truth_intent": {"required_packages": ["rsync"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Essential backup dependency 'rsync' is absent from the system."
+  },
+  {
+    "id": "026",
+    "category": "Package Drift",
+    "doc_snippet": "We strictly use Docker for container orchestration. Ensure the docker.io package is installed and up to date.",
+    "ground_truth_intent": {"required_packages": ["docker.io"]},
+    "simulated_live_state": {"installed_packages": ["podman"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). Documentation specifies 'docker.io', but system has 'podman'. The docs likely missed the migration to Podman."
+  },
+  {
+    "id": "027",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "For security monitoring, the fail2ban service must be actively running to parse auth logs and ban malicious IPs.",
+    "ground_truth_intent": {"required_services": ["fail2ban"]},
+    "simulated_live_state": {"running_services": ["sshd", "ufw"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required 'fail2ban' service is not running, leaving the system vulnerable."
+  },
+  {
+    "id": "028",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "All metrics are forwarded to our central dashboard. The datadog-agent service must be enabled and running.",
+    "ground_truth_intent": {"required_services": ["datadog-agent"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The telemetry agent 'datadog-agent' is currently stopped."
+  },
+  {
+    "id": "029",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "The backend API is served via a containerized setup. Verify that the api-gateway docker container is healthy and running.",
+    "ground_truth_intent": {"required_services": ["api-gateway"]},
+    "simulated_live_state": {"running_services": ["payment-service"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires 'api-gateway', but docker ps does not list it among running containers."
+  },
+  {
+    "id": "030",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "SSH access is critical for out-of-band management. The sshd systemd service must never be stopped.",
+    "ground_truth_intent": {"required_services": ["sshd"]},
+    "simulated_live_state": {"running_services": ["vsftpd"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Critical service 'sshd' is not running, potentially locking out administrators."
+  },
+  {
+    "id": "031",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Asynchronous task processing is handled by Celery. Make sure the celery-worker service is active in systemctl.",
+    "ground_truth_intent": {"required_services": ["celery-worker"]},
+    "simulated_live_state": {"running_services": ["nginx", "postgresql"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'celery-worker' service required by the runbook is not currently active."
+  },
+  {
+    "id": "032",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To enable caching and optimize express middleware, ensure the NODE_ENV variable is explicitly set to 'production'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "NODE_ENV", "value": "production"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "NODE_ENV", "value": "development"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Intent requires production mode, but live state shows NODE_ENV is set to development."
+  },
+  {
+    "id": "033",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "The AWS SDK automatically picks up routing configurations. You must configure the AWS_REGION environment variable for the script to work.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "AWS_REGION", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "AWS_PROFILE", "value": "default"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required routing variable 'AWS_REGION' is missing from the environment."
+  },
+  {
+    "id": "034",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "External API calls require authentication. Please inject the STRIPE_API_KEY environment variable into the runtime.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "STRIPE_API_KEY", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing critical secret 'STRIPE_API_KEY' required for external communication."
+  },
+  {
+    "id": "035",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To utilize all available CPU cores on this VM size, set GOMAXPROCS to 4 in your bash profile.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "GOMAXPROCS", "value": "4"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "GOMAXPROCS", "value": "2"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Intent requires GOMAXPROCS to be 4, but printenv output shows it is misconfigured to 2."
+  },
+  {
+    "id": "036",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Custom modules are stored outside the default directory. Add '/opt/custom_libs' to your PYTHONPATH variable.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "PYTHONPATH", "value": "/opt/custom_libs"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "PATH", "value": "/usr/bin:/bin"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required environment variable 'PYTHONPATH' is entirely absent."
+  },
+  {
+    "id": "037",
+    "category": "Port Drift",
+    "doc_snippet": "Hardware telemetry is polled via SNMP. The SNMP agent must be configured to listen on the standard UDP port 161.",
+    "ground_truth_intent": {"required_ports": ["161"]},
+    "simulated_live_state": {"active_ports": ["162"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires SNMP polling on port 161, but the system is listening on 162 (typically used for SNMP traps instead of polling)."
+  },
+  {
+    "id": "038",
+    "category": "Port Drift",
+    "doc_snippet": "To ensure email alerts are encrypted in transit, the local Postfix relay must accept connections on the submission port 587.",
+    "ground_truth_intent": {"required_ports": ["587"]},
+    "simulated_live_state": {"active_ports": ["25"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). System is listening on the unencrypted SMTP port 25, violating the documentation's requirement for port 587."
+  },
+  {
+    "id": "039",
+    "category": "Port Drift",
+    "doc_snippet": "The Kafka broker is the backbone of our event-driven architecture. Ensure it is reachable internally on port 9092.",
+    "ground_truth_intent": {"required_ports": ["9092"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required Kafka port 9092 is not open, indicating the broker is down or failing to bind."
+  },
+  {
+    "id": "040",
+    "category": "Port Drift",
+    "doc_snippet": "The React frontend runs via a lightweight Node development server on port 3000 during staging.",
+    "ground_truth_intent": {"required_ports": ["3000"]},
+    "simulated_live_state": {"active_ports": ["3001"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Expected port 3000 is inactive. The system is listening on 3001, likely because port 3000 was already in use when the server started."
+  },
+  {
+    "id": "041",
+    "category": "Package Drift",
+    "doc_snippet": "Building the custom C++ plugins requires a modern build system. Ensure cmake is installed on the build servers.",
+    "ground_truth_intent": {"required_packages": ["cmake"]},
+    "simulated_live_state": {"installed_packages": ["make"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The runbook explicitly requires 'cmake', but only 'make' is installed on the system."
+  },
+  {
+    "id": "042",
+    "category": "Package Drift",
+    "doc_snippet": "For legacy networking script compatibility, the net-tools package must be present alongside modern iproute2.",
+    "ground_truth_intent": {"required_packages": ["net-tools", "iproute2"]},
+    "simulated_live_state": {"installed_packages": ["iproute2"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The documentation mandates 'net-tools' for legacy compatibility, but it is missing from the live state."
+  },
+  {
+    "id": "043",
+    "category": "Package Drift",
+    "doc_snippet": "Our enterprise application requires features introduced in Java 17. The openjdk-17-jdk package must be installed.",
+    "ground_truth_intent": {"required_packages": ["openjdk-17-jdk"]},
+    "simulated_live_state": {"installed_packages": ["openjdk-11-jdk"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). System has Java 11 installed, but documentation explicitly requires Java 17."
+  },
+  {
+    "id": "044",
+    "category": "Package Drift",
+    "doc_snippet": "The CI/CD runner fetches source code directly from GitHub. The git package is a strict requirement for this node.",
+    "ground_truth_intent": {"required_packages": ["git"]},
+    "simulated_live_state": {"installed_packages": ["subversion"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The essential 'git' package is completely missing from the system."
+  },
+  {
+    "id": "045",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Accurate timestamps are critical for database consistency. The chronyd service must be used for NTP synchronization.",
+    "ground_truth_intent": {"required_services": ["chronyd"]},
+    "simulated_live_state": {"running_services": ["ntpd"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). System is running the older 'ntpd' instead of 'chronyd'. The documentation may have been updated before the actual migration took place."
+  },
+  {
+    "id": "046",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "We have standardized on Apache for our static file hosting. Ensure the apache2 service is enabled.",
+    "ground_truth_intent": {"required_services": ["apache2"]},
+    "simulated_live_state": {"running_services": ["nginx"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Intent requires 'apache2', but the live system is running 'nginx', violating the hosting standardization."
+  },
+  {
+    "id": "047",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Host-based firewall rules are managed via the Uncomplicated Firewall. Verify that the ufw service is active.",
+    "ground_truth_intent": {"required_services": ["ufw"]},
+    "simulated_live_state": {"running_services": ["firewalld"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required 'ufw' firewall is not active; 'firewalld' is running instead, which could lead to conflicting security rules."
+  },
+  {
+    "id": "048",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Tomcat relies on a specific JDK installation path. The JAVA_HOME environment variable must be exported correctly.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "JAVA_HOME", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The critical 'JAVA_HOME' environment variable is not defined in the current shell context."
+  },
+  {
+    "id": "049",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To activate the new frontend dashboard layout, the ENABLE_V2_UI feature flag environment variable must be set to 'true'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "ENABLE_V2_UI", "value": "true"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "ENABLE_V2_UI", "value": "false"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires 'ENABLE_V2_UI' to be true, but printenv shows it is currently toggled to false."
+  },
+  {
+    "id": "050",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "The microservice connects to the database pooler rather than directly to the DB. Ensure DB_PORT is set to 6432.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "DB_PORT", "value": "6432"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "DB_PORT", "value": "5432"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'DB_PORT' is set to the default 5432 instead of the required pooler port 6432."
+  },
+  {
+    "id": "051",
+    "category": "Port Drift",
+    "doc_snippet": "The MongoDB replica set communicates on the standard port 27017. Please ensure it is bound to the internal interface.",
+    "ground_truth_intent": {"required_ports": ["27017"]},
+    "simulated_live_state": {"active_ports": ["27018"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Intent requires MongoDB on 27017, but the system is listening on 27018."
+  },
+  {
+    "id": "052",
+    "category": "Port Drift",
+    "doc_snippet": "In-memory caching is handled by Redis. Make sure the port 6379 is open for the application tier.",
+    "ground_truth_intent": {"required_ports": ["6379"]},
+    "simulated_live_state": {"active_ports": ["6380"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Redis port 6379 is inactive; the system is using port 6380 instead."
+  },
+  {
+    "id": "053",
+    "category": "Port Drift",
+    "doc_snippet": "The internal Flask microservice should be running on port 5000 for local testing and debugging.",
+    "ground_truth_intent": {"required_ports": ["5000"]},
+    "simulated_live_state": {"active_ports": ["5001"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required port 5000 is not bound. Live state shows 5001 is active."
+  },
+  {
+    "id": "054",
+    "category": "Port Drift",
+    "doc_snippet": "We deploy the Java WAR file using Apache Tomcat. The server must be listening on HTTP port 8080.",
+    "ground_truth_intent": {"required_ports": ["8080"]},
+    "simulated_live_state": {"active_ports": ["80"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). Tomcat is running on port 80 (standard HTTP) rather than the default 8080 specified in the docs."
+  },
+  {
+    "id": "055",
+    "category": "Port Drift",
+    "doc_snippet": "For remote GUI access during emergencies, the VNC server should be listening on port 5900.",
+    "ground_truth_intent": {"required_ports": ["5900"]},
+    "simulated_live_state": {"active_ports": ["5901"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). VNC is running on display :1 (port 5901) instead of the required display :0 (port 5900)."
+  },
+  {
+    "id": "056",
+    "category": "Port Drift",
+    "doc_snippet": "The Windows legacy jump host is mapped through a local proxy. Ensure port 3389 is exposed for RDP connections.",
+    "ground_truth_intent": {"required_ports": ["3389"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required RDP port 3389 is completely absent from the live state."
+  },
+  {
+    "id": "057",
+    "category": "Port Drift",
+    "doc_snippet": "Legacy file uploads happen over FTP. The server must accept passive connections starting on port 21.",
+    "ground_truth_intent": {"required_ports": ["21"]},
+    "simulated_live_state": {"active_ports": ["2121"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The system is listening on alternate FTP port 2121, but documentation mandates standard port 21."
+  },
+  {
+    "id": "058",
+    "category": "Port Drift",
+    "doc_snippet": "The network switch configuration utility requires Telnet for initial bootstrapping. Keep port 23 open temporarily.",
+    "ground_truth_intent": {"required_ports": ["23"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Telnet port 23 is closed, preventing the documented bootstrapping process."
+  },
+  {
+    "id": "059",
+    "category": "Port Drift",
+    "doc_snippet": "Outbound transactional emails are sent via an SMTP relay. The service needs to listen on port 25.",
+    "ground_truth_intent": {"required_ports": ["25"]},
+    "simulated_live_state": {"active_ports": ["2525"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires SMTP on 25, but the system is mapped to 2525."
+  },
+  {
+    "id": "060",
+    "category": "Port Drift",
+    "doc_snippet": "All internal servers must synchronize time against the core router. Ensure UDP port 123 is open for NTP.",
+    "ground_truth_intent": {"required_ports": ["123"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required NTP port 123 is not active."
+  },
+  {
+    "id": "061",
+    "category": "Port Drift",
+    "doc_snippet": "The statsD daemon aggregates custom application metrics. It must be reachable via UDP on port 8125.",
+    "ground_truth_intent": {"required_ports": ["8125"]},
+    "simulated_live_state": {"active_ports": ["8126"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). StatsD is running on 8126 instead of the standard 8125."
+  },
+  {
+    "id": "062",
+    "category": "Port Drift",
+    "doc_snippet": "Vault secrets management is deployed locally. The UI and API should be accessible on port 8200.",
+    "ground_truth_intent": {"required_ports": ["8200"]},
+    "simulated_live_state": {"active_ports": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Vault port 8200 is not exposed, indicating the secrets manager is offline."
+  },
+  {
+    "id": "063",
+    "category": "Port Drift",
+    "doc_snippet": "Our Consul agent is required for service discovery. Client RPC communication happens over port 8300.",
+    "ground_truth_intent": {"required_ports": ["8300"]},
+    "simulated_live_state": {"active_ports": ["8500"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). Consul is listening on 8500 (HTTP API), but the doc specified 8300 (RPC). Drift in port roles."
+  },
+  {
+    "id": "064",
+    "category": "Package Drift",
+    "doc_snippet": "To maintain persistent terminal sessions during long deployments, tmux must be installed on all bastion hosts.",
+    "ground_truth_intent": {"required_packages": ["tmux"]},
+    "simulated_live_state": {"installed_packages": ["screen"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Runbook requires 'tmux', but only 'screen' is installed."
+  },
+  {
+    "id": "065",
+    "category": "Package Drift",
+    "doc_snippet": "Our standard command line text editor is vim. Make sure it is installed; do not use nano.",
+    "ground_truth_intent": {"required_packages": ["vim"]},
+    "simulated_live_state": {"installed_packages": ["nano"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation explicitly bans 'nano' and requires 'vim', but live state contradicts this."
+  },
+  {
+    "id": "066",
+    "category": "Package Drift",
+    "doc_snippet": "To generate self-signed certificates for local development, the openssl package is strictly required.",
+    "ground_truth_intent": {"required_packages": ["openssl"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required security package 'openssl' is missing."
+  },
+  {
+    "id": "067",
+    "category": "Package Drift",
+    "doc_snippet": "For our package manager to securely fetch updates over HTTPS, ca-certificates must be kept up to date.",
+    "ground_truth_intent": {"required_packages": ["ca-certificates"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'ca-certificates' package is missing, breaking secure downloads."
+  },
+  {
+    "id": "068",
+    "category": "Package Drift",
+    "doc_snippet": "The SSR frontend relies on Node. Ensure the nodejs package is installed before attempting to build.",
+    "ground_truth_intent": {"required_packages": ["nodejs"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Essential build dependency 'nodejs' is absent."
+  },
+  {
+    "id": "069",
+    "category": "Package Drift",
+    "doc_snippet": "We manage JavaScript dependencies using standard NPM. Verify that the npm package is available.",
+    "ground_truth_intent": {"required_packages": ["npm"]},
+    "simulated_live_state": {"installed_packages": ["yarn"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). System has 'yarn' installed instead of 'npm'. Documentation may be outdated."
+  },
+  {
+    "id": "070",
+    "category": "Package Drift",
+    "doc_snippet": "System administration scripts are written in Python. Ensure python3-pip is installed to fetch required libraries.",
+    "ground_truth_intent": {"required_packages": ["python3-pip"]},
+    "simulated_live_state": {"installed_packages": ["python3"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Python is present, but 'python3-pip' is missing, preventing library installation."
+  },
+  {
+    "id": "071",
+    "category": "Package Drift",
+    "doc_snippet": "The telemetry agent is written in Go. You will need the golang package installed to compile it from source.",
+    "ground_truth_intent": {"required_packages": ["golang"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing required 'golang' package."
+  },
+  {
+    "id": "072",
+    "category": "Package Drift",
+    "doc_snippet": "To enforce strict memory safety in the new cryptographic module, the rustc compiler must be installed.",
+    "ground_truth_intent": {"required_packages": ["rustc"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required package 'rustc' is missing from the system state."
+  },
+  {
+    "id": "073",
+    "category": "Package Drift",
+    "doc_snippet": "Legacy Chef recipes are still executed during provision. The ruby package is required for them to run.",
+    "ground_truth_intent": {"required_packages": ["ruby"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing 'ruby' dependency will cause Chef provisioning to fail."
+  },
+  {
+    "id": "074",
+    "category": "Package Drift",
+    "doc_snippet": "The cron jobs execute raw PHP scripts. Ensure the php-cli package is installed for command-line execution.",
+    "ground_truth_intent": {"required_packages": ["php-cli"]},
+    "simulated_live_state": {"installed_packages": ["php-fpm"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The system has 'php-fpm' (for web serving) but is missing the required 'php-cli' for scripts."
+  },
+  {
+    "id": "075",
+    "category": "Package Drift",
+    "doc_snippet": "Deployment artifacts are downloaded as compressed archives. You must have unzip installed to extract them.",
+    "ground_truth_intent": {"required_packages": ["unzip"]},
+    "simulated_live_state": {"installed_packages": ["tar"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Artifact extraction will fail because 'unzip' is not installed."
+  },
+  {
+    "id": "076",
+    "category": "Package Drift",
+    "doc_snippet": "The host intrusion detection system requires the auditd package to monitor filesystem changes.",
+    "ground_truth_intent": {"required_packages": ["auditd"]},
+    "simulated_live_state": {"installed_packages": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Critical security monitoring package 'auditd' is missing."
+  },
+  {
+    "id": "077",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "This node is part of the Kubernetes cluster. The kubelet service must be running and enabled.",
+    "ground_truth_intent": {"required_services": ["kubelet"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The required 'kubelet' service is inactive, meaning this node is detached from the cluster."
+  },
+  {
+    "id": "078",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "We have fully migrated away from Docker. Ensure the containerd service is the only running container runtime.",
+    "ground_truth_intent": {"required_services": ["containerd"]},
+    "simulated_live_state": {"running_services": ["docker"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation strictly mandates 'containerd', but 'docker' is still running."
+  },
+  {
+    "id": "079",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "For secure peer-to-peer networking between cloud environments, the tailscaled service must be active.",
+    "ground_truth_intent": {"required_services": ["tailscaled"]},
+    "simulated_live_state": {"running_services": ["openvpn"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). System is running 'openvpn' instead of 'tailscaled'. Possibly a legacy configuration or outdated doc."
+  },
+  {
+    "id": "080",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Shared network drives for the office are hosted here. Verify that the smbd (Samba) service is running.",
+    "ground_truth_intent": {"required_services": ["smbd"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Samba service 'smbd' is stopped, preventing file sharing."
+  },
+  {
+    "id": "081",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Linux clients mount directories over the network. The nfs-kernel-server service is required to export these shares.",
+    "ground_truth_intent": {"required_services": ["nfs-kernel-server"]},
+    "simulated_live_state": {"running_services": ["rpcbind"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). 'rpcbind' is active, but the actual 'nfs-kernel-server' service is missing or stopped."
+  },
+  {
+    "id": "082",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Network printing is handled by this CUPS server. Make sure the cups systemd service is active.",
+    "ground_truth_intent": {"required_services": ["cups"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Print spooler service 'cups' is currently inactive."
+  },
+  {
+    "id": "083",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Mail routing is handled internally by Postfix. Ensure the postfix service is enabled on boot and currently running.",
+    "ground_truth_intent": {"required_services": ["postfix"]},
+    "simulated_live_state": {"running_services": ["exim4"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The system is running 'exim4' instead of the required 'postfix' mailer."
+  },
+  {
+    "id": "084",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "The local IMAP server is used for legacy app integration. The dovecot service must be active.",
+    "ground_truth_intent": {"required_services": ["dovecot"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required IMAP service 'dovecot' is not running."
+  },
+  {
+    "id": "085",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "DNS resolution for the internal VPC relies on the bind9 service. It must be actively running.",
+    "ground_truth_intent": {"required_services": ["bind9"]},
+    "simulated_live_state": {"running_services": ["dnsmasq"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). System uses 'dnsmasq' instead of 'bind9'. Documentation is likely out of sync."
+  },
+  {
+    "id": "086",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Layer 7 load balancing is handled by HAProxy. The haproxy service must be running as a reverse proxy.",
+    "ground_truth_intent": {"required_services": ["haproxy"]},
+    "simulated_live_state": {"running_services": ["nginx"]},
+    "expected_reconciliation": "Drift detected (DOC_FAULT). 'nginx' is running as the load balancer instead of the documented 'haproxy'."
+  },
+  {
+    "id": "087",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "To forward system logs to the central SIEM, the rsyslog service is mandatory on all infrastructure.",
+    "ground_truth_intent": {"required_services": ["rsyslog"]},
+    "simulated_live_state": {"running_services": ["syslog-ng"]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). 'syslog-ng' is installed/running rather than the mandated 'rsyslog'."
+  },
+  {
+    "id": "088",
+    "category": "Service/Docker Drift",
+    "doc_snippet": "Virtual machines are managed via KVM/QEMU. Ensure the libvirtd service is active to allow VM provisioning.",
+    "ground_truth_intent": {"required_services": ["libvirtd"]},
+    "simulated_live_state": {"running_services": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). VM management service 'libvirtd' is stopped."
+  },
+  {
+    "id": "089",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To ensure log timestamps align globally, the TZ environment variable must be set to 'UTC'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "TZ", "value": "UTC"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "TZ", "value": "America/New_York"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). System timezone variable is set to America/New_York, violating the UTC requirement."
+  },
+  {
+    "id": "090",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Traffic to external APIs must go through the corporate proxy. Set HTTP_PROXY in your environment.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "HTTP_PROXY", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Required 'HTTP_PROXY' configuration is completely missing."
+  },
+  {
+    "id": "091",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Ensure encrypted outbound traffic also uses the proxy by explicitly setting HTTPS_PROXY.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "HTTPS_PROXY", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing required 'HTTPS_PROXY' environment variable."
+  },
+  {
+    "id": "092",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "For git commit messages and crontab editing, explicitly set your EDITOR variable to 'vim'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "EDITOR", "value": "vim"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "EDITOR", "value": "nano"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The user environment sets EDITOR to nano, contradicting the strict vim policy."
+  },
+  {
+    "id": "093",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To prevent character encoding issues in database dumps, the LANG environment variable must be 'en_US.UTF-8'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "LANG", "value": "en_US.UTF-8"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "LANG", "value": "C"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). LANG is set to legacy 'C' instead of the required UTF-8 encoding."
+  },
+  {
+    "id": "094",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "The deployment script needs to authenticate with the cluster. Export the KUBECONFIG variable pointing to your auth file.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "KUBECONFIG", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing 'KUBECONFIG', which will cause kubectl commands to fail."
+  },
+  {
+    "id": "095",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "We connect to a remote Docker daemon for builds. The DOCKER_HOST variable must be defined.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "DOCKER_HOST", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). DOCKER_HOST is not set, meaning docker commands will try to use the local socket."
+  },
+  {
+    "id": "096",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Programmatic AWS access is required. Ensure AWS_ACCESS_KEY_ID is securely set in the runtime environment.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "AWS_ACCESS_KEY_ID", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Critical AWS credential 'AWS_ACCESS_KEY_ID' is missing from the environment."
+  },
+  {
+    "id": "097",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "Along with the Key ID, the AWS_SECRET_ACCESS_KEY must be populated for S3 uploads to succeed.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "AWS_SECRET_ACCESS_KEY", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Missing required secret 'AWS_SECRET_ACCESS_KEY'."
+  },
+  {
+    "id": "098",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To bypass API rate limits during automated package fetching, set the GITHUB_TOKEN environment variable.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "GITHUB_TOKEN", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). The 'GITHUB_TOKEN' variable is absent, risking rate-limit bans during deployments."
+  },
+  {
+    "id": "099",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "The Intent Extractor Agent utilizes LLM reasoning. The OPENAI_API_KEY environment variable is mandatory for it to function.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "OPENAI_API_KEY", "value": "*"}]},
+    "simulated_live_state": {"active_env_vars": []},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Core API key 'OPENAI_API_KEY' is not injected into the environment."
+  },
+  {
+    "id": "100",
+    "category": "Environment Variable Drift",
+    "doc_snippet": "To suppress interactive prompts during apt-get installations, ensure the CI variable is set to 'true'.",
+    "ground_truth_intent": {"required_env_vars": [{"name": "CI", "value": "true"}]},
+    "simulated_live_state": {"active_env_vars": [{"name": "CI", "value": "false"}]},
+    "expected_reconciliation": "Drift detected (SYSTEM_FAULT). Documentation requires CI=true for automated installs, but the live state is false, which may cause script hangs."
+  }
+]
