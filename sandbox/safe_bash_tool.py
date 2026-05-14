@@ -85,6 +85,24 @@ class SafeBashTool(BaseTool):
         # Docker probing
         if "docker" in cmd:
             services = state.get("running_services", [])
+            # Extract the specific container name being queried
+            # e.g. "docker ps --filter name=redis-server" -> "redis-server"
+            import re as _re
+            name_match = _re.search(r'name=(\S+)', command)
+            queried = name_match.group(1).lower() if name_match else None
+            if queried:
+                svc_lower = [s.lower() for s in services]
+                if queried in svc_lower:
+                    return (
+                        f"RESULT: Container '{queried}' IS running (Up).\n"
+                        f"running_services = {json.dumps([queried])}"
+                    )
+                else:
+                    return (
+                        f"RESULT: Container '{queried}' is NOT running (not found).\n"
+                        f"Other containers running: {json.dumps(services)}\n"
+                        f"running_services = []"
+                    )
             if not services:
                 return (
                     "RESULT: No Docker containers are currently running. "
@@ -100,6 +118,25 @@ class SafeBashTool(BaseTool):
         # Systemd probing
         if "systemctl" in cmd:
             services = state.get("running_services", [])
+            # Extract the specific service name being queried from the command
+            # e.g. "systemctl is-active redis-server" -> "redis-server"
+            import re as _re
+            svc_match = _re.search(r'systemctl\s+\S+\s+(\S+)', command)
+            queried = svc_match.group(1).lower() if svc_match else None
+            if queried:
+                svc_lower = [s.lower() for s in services]
+                if queried in svc_lower:
+                    return (
+                        f"RESULT: Service '{queried}' IS active (running).\n"
+                        f"running_services = {json.dumps([queried])}"
+                    )
+                else:
+                    return (
+                        f"RESULT: Service '{queried}' is NOT active (inactive/dead).\n"
+                        f"Other services running: {json.dumps(services)}\n"
+                        f"running_services = []"
+                    )
+            # Fallback if we can't parse service name
             if not services:
                 return (
                     "RESULT: Service is NOT active (inactive/dead). "

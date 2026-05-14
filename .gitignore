@@ -1,2 +1,17 @@
+# Secrets — NEVER commit
 .env
+
+# Virtual environment
 venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Pipeline output reports (optional — keep if you want them in the repo)
+outputs/*.json
+
+# OS files
+.DS_Store
+Thumbs.db
